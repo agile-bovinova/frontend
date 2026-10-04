@@ -9,7 +9,6 @@ import {LayoutDashboard as DashboardIcon} from "lucide-react";
 import {PawPrint as PetsIcon} from "lucide-react";
 import {House as CabinIcon} from "lucide-react";
 import {Megaphone as CampaignIcon} from "lucide-react";
-import {Users as PeopleAltIcon} from "lucide-react";
 import {Package as InventoryIcon} from "lucide-react";
 import {HeartPulse as MonitorHeartIcon} from "lucide-react";
 import {Bell as NotificationsIcon} from "lucide-react";
@@ -17,15 +16,11 @@ import {LogOut as LogoutIcon} from "lucide-react";
 import { useAuthStore } from "../../auth/store/auth-store";
 import { useGlobalStore } from "../stores/global-store";
 import { AlertToaster } from "../../alerts/components/AlertToaster";
-import { canManageStaff } from "../utils/access-control";
 
 type NavItem = {
     to: string;
     icon: ReactNode;
     label: string;
-    plusOnly?: boolean;
-    requiresStaffManagement?: boolean;
-    requiresSubscriptionManagement?: boolean;
 };
 
 const navItems: NavItem[] = [
@@ -33,9 +28,8 @@ const navItems: NavItem[] = [
     { to: "/animals", icon: <PetsIcon />, label: "Ganado" },
     { to: "/stables", icon: <CabinIcon />, label: "Establos" },
     { to: "/campaigns", icon: <CampaignIcon />, label: "Campañas" },
-    { to: "/staff", icon: <PeopleAltIcon />, label: "Personal", requiresStaffManagement: true },
     { to: "/inventory", icon: <InventoryIcon />, label: "Inventario" },
-    { to: "/monitoring", icon: <MonitorHeartIcon />, label: "Monitoreo", plusOnly: true },
+    { to: "/monitoring", icon: <MonitorHeartIcon />, label: "Monitoreo" },
     { to: "/alerts", icon: <NotificationsIcon />, label: "Alertas" },
 ];
 
@@ -103,7 +97,6 @@ function SidebarContent({ expanded, onToggle, onNavigate }: { expanded: boolean;
 
             <nav className={`flex-1 flex flex-col gap-0.5 transition-all duration-300 ${expanded ? 'p-3 mt-2' : 'p-2 mt-3 items-center'}`}>
                 {navItems
-                    .filter(item => !item.requiresStaffManagement || canManageStaff(user))
                     .map(item => (
                     <NavLink
                         key={item.to}

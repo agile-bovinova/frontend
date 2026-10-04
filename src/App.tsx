@@ -6,10 +6,8 @@ import { DashboardPage } from "./dashboard/pages/DashboardPage"
 import { InventoryPage } from "./inventory/pages/InventoryPage"
 import { AlertsPage } from "./alerts/pages/AlertsPage"
 import { MonitoringPage } from "./monitoring/pages/MonitoringPage"
-import { AccessRoute } from "./shared/pages/AccessRoute"
 import { PrivateRoute } from "./shared/pages/PrivateRoute"
 import { StablesPage } from "./stables/pages/StablesPage"
-import { StaffPage } from "./staff/pages/StaffPage"
 
 function App() {
   return (
@@ -25,9 +23,6 @@ function App() {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
 
-        <Route element={<AccessRoute permission="manageStaff" />}>
-          <Route path="/staff" element={<StaffPage />} />
-        </Route>
 
         <Route path="/monitoring" element={<MonitoringPage />} />
       </Route>

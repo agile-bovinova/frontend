@@ -73,7 +73,7 @@ interface AuthState {
      */
     fetchPermissions: () => Promise<void>;
 
-    setSubscription: (plan: string) => void;
+    setSubscription: (_plan: string) => void;
 }
 
 export const useAuthStore = create(immer<AuthState>((set, get) => ({
@@ -182,7 +182,7 @@ export const useAuthStore = create(immer<AuthState>((set, get) => ({
             });
         }
     },
-    setSubscription: (plan: string) =>
+    setSubscription: (_plan: string) =>
         set(state => {
             // Reassign a new object (not in-place) so immer emits a new reference:
             // User is a class instance, which immer does not draft, so an in-place

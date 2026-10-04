@@ -22,7 +22,7 @@ interface AnimalCardProps {
 
 export function AnimalCard({ animal }: AnimalCardProps) {
   const { deleteAnimal, updateAnimal, stables, breeds } = useGlobalStore();
-  const isPlus = useAuthStore((s) => s.user.subscriptionPlan === "Plus");
+  const isPlus = true;
   const editable = useAuthStore((s) => canEdit(s.user));
 
   const [isEditing, setIsEditing] = useState(false);

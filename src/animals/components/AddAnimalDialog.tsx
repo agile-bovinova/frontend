@@ -2,7 +2,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useGlobalStore } from "../../shared/stores/global-store";
 import { useAnimalStore } from "../stores/animals-store";
-import { useAuthStore } from "../../auth/store/auth-store";
 import { useCollarStore } from "../../collars/stores/collar-store";
 import { makeCollarDeviceId } from "../../collars/lib/collar-id";
 import dayjs from "dayjs";
@@ -19,7 +18,7 @@ export function AddAnimalDialog() {
   const { isOpenModal, toggleModal, newAnimal, setNewAnimal, resetNewAnimal } =
     useAnimalStore();
   const { addAnimal, stables, breeds } = useGlobalStore();
-  const isPlus = useAuthStore((s) => s.user.subscriptionPlan === "Plus");
+  const isPlus = true;
   const { capacity, register, fetchCollars, availableNumbers } = useCollarStore();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [validationError, setValidationError] = useState<string>("");
