@@ -13,7 +13,6 @@ import {Users as PeopleAltIcon} from "lucide-react";
 import {Package as InventoryIcon} from "lucide-react";
 import {HeartPulse as MonitorHeartIcon} from "lucide-react";
 import {Bell as NotificationsIcon} from "lucide-react";
-import {Sparkles as AutoAwesomeIcon} from "lucide-react";
 import {Crown as SubscriptionIcon} from "lucide-react";
 import {LogOut as LogoutIcon} from "lucide-react";
 import { useAuthStore } from "../../auth/store/auth-store";
@@ -40,7 +39,6 @@ const navItems: NavItem[] = [
     { to: "/inventory", icon: <InventoryIcon />, label: "Inventario" },
     { to: "/monitoring", icon: <MonitorHeartIcon />, label: "Monitoreo", plusOnly: true },
     { to: "/alerts", icon: <NotificationsIcon />, label: "Alertas" },
-    { to: "/ai-assistant", icon: <AutoAwesomeIcon />, label: "Asistente IA", plusOnly: true },
     { to: "/subscription-management", icon: <SubscriptionIcon />, label: "Suscripción", requiresSubscriptionManagement: true },
 ];
 
