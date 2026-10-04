@@ -23,14 +23,12 @@ function saveUser(user: User) {
         id: user.id,
         username: user.username,
         email: user.email,
-        subscriptionPlan: user.subscriptionPlan,
         isStaff: user.isStaff,
         effectiveUserId: user.effectiveUserId,
         accessLevel: user.accessLevel,
         canRead: user.canRead,
         canEdit: user.canEdit,
         canManageStaff: user.canManageStaff,
-        canManageSubscription: user.canManageSubscription,
     }));
 }
 
@@ -153,14 +151,12 @@ export const useAuthStore = create(immer<AuthState>((set, get) => ({
                     id: profile.id,
                     username: profile.name ?? state.user.username,
                     email: profile.email ?? state.user.email,
-                    subscriptionPlan: profile.subscriptionPlan,
                     isStaff: profile.isStaff,
                     effectiveUserId: profile.effectiveUserId,
                     accessLevel: profile.accessLevel,
                     canRead: profile.canRead,
                     canEdit: profile.canEdit,
                     canManageStaff: profile.canManageStaff,
-                    canManageSubscription: profile.canManageSubscription,
                 };
                 state.permissionsLoaded = true;
                 // For staff the backend reports the OWNER's plan, so Plus features
@@ -179,7 +175,6 @@ export const useAuthStore = create(immer<AuthState>((set, get) => ({
                     canRead: false,
                     canEdit: false,
                     canManageStaff: false,
-                    canManageSubscription: false,
                 };
                 state.permissionsLoaded = true;
                 state.error = extractApiErrorMessage(
@@ -192,7 +187,6 @@ export const useAuthStore = create(immer<AuthState>((set, get) => ({
             // Reassign a new object (not in-place) so immer emits a new reference:
             // User is a class instance, which immer does not draft, so an in-place
             // mutation would not notify subscribers until a remount.
-            state.user = { ...state.user, subscriptionPlan: plan };
             state.planLoaded = true;
         }),
 })));

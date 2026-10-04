@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router";
 import { useAuthStore } from "../../auth/store/auth-store";
-import { canManageStaff, canManageSubscription } from "../utils/access-control";
+import { canManageStaff } from "../utils/access-control";
 
 interface AccessRouteProps {
-    permission: "manageStaff" | "manageSubscription";
+    permission: "manageStaff";
 }
 
 // Guards routes behind a backend-resolved permission. Waits until permissions
@@ -14,9 +14,7 @@ export function AccessRoute({ permission }: AccessRouteProps) {
 
     if (!permissionsLoaded) return null;
 
-    const allowed = permission === "manageStaff"
-        ? canManageStaff(user)
-        : canManageSubscription(user);
+    const allowed = permission === "manageStaff" ? canManageStaff(user) : false;
 
     return allowed ? <Outlet /> : <Navigate to="/dashboard" replace />;
 }

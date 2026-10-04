@@ -19,6 +19,3 @@ export function canManageStaff(user?: User | null) {
     return Boolean(user?.canManageStaff);
 }
 
-export function canManageSubscription(user?: User | null) {
-    return Boolean(user?.canManageSubscription);
-}

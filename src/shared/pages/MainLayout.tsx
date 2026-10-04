@@ -13,13 +13,11 @@ import {Users as PeopleAltIcon} from "lucide-react";
 import {Package as InventoryIcon} from "lucide-react";
 import {HeartPulse as MonitorHeartIcon} from "lucide-react";
 import {Bell as NotificationsIcon} from "lucide-react";
-import {Crown as SubscriptionIcon} from "lucide-react";
 import {LogOut as LogoutIcon} from "lucide-react";
 import { useAuthStore } from "../../auth/store/auth-store";
 import { useGlobalStore } from "../stores/global-store";
-import { useSubscriptionStore } from "../../subscription/stores/subscription-store";
 import { AlertToaster } from "../../alerts/components/AlertToaster";
-import { canManageStaff, canManageSubscription } from "../utils/access-control";
+import { canManageStaff } from "../utils/access-control";
 
 type NavItem = {
     to: string;
@@ -39,14 +37,12 @@ const navItems: NavItem[] = [
     { to: "/inventory", icon: <InventoryIcon />, label: "Inventario" },
     { to: "/monitoring", icon: <MonitorHeartIcon />, label: "Monitoreo", plusOnly: true },
     { to: "/alerts", icon: <NotificationsIcon />, label: "Alertas" },
-    { to: "/subscription-management", icon: <SubscriptionIcon />, label: "Suscripción", requiresSubscriptionManagement: true },
 ];
 
 function SidebarContent({ expanded, onToggle, onNavigate }: { expanded: boolean; onToggle: () => void; onNavigate: () => void }) {
     const user = useAuthStore(s => s.user);
     const info = useGlobalStore(s => s.info);
     const logout = useAuthStore(s => s.logout);
-    const isPlus = useAuthStore(s => s.user.subscriptionPlan === "Plus");
     const navigate = useNavigate();
     const displayName = info?.name || user?.username || user?.email?.split('@')[0] || "Usuario";
     const initials = displayName.slice(0, 2).toUpperCase();
@@ -99,15 +95,7 @@ function SidebarContent({ expanded, onToggle, onNavigate }: { expanded: boolean;
                 <div className={`overflow-hidden transition-all duration-300 ${expanded ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 max-w-0'}`}>
                     <div className="flex items-center gap-2">
                         <h3 className="text-white font-semibold font-inter text-base leading-tight whitespace-nowrap">{displayName}</h3>
-                        <span
-                            className={`text-[10px] font-bold font-inter uppercase tracking-wide px-2 py-0.5 rounded-full whitespace-nowrap ${
-                                isPlus
-                                    ? "bg-amber-300 text-amber-900"
-                                    : "bg-white/20 text-white/80"
-                            }`}
-                        >
-                            {isPlus ? "Plus" : "Free"}
-                        </span>
+                        
                     </div>
                     <p className="text-white/60 text-sm font-inter truncate mt-0.5 whitespace-nowrap">{user?.email || ""}</p>
                 </div>
@@ -115,9 +103,7 @@ function SidebarContent({ expanded, onToggle, onNavigate }: { expanded: boolean;
 
             <nav className={`flex-1 flex flex-col gap-0.5 transition-all duration-300 ${expanded ? 'p-3 mt-2' : 'p-2 mt-3 items-center'}`}>
                 {navItems
-                    .filter(item => !item.plusOnly || isPlus)
                     .filter(item => !item.requiresStaffManagement || canManageStaff(user))
-                    .filter(item => !item.requiresSubscriptionManagement || canManageSubscription(user))
                     .map(item => (
                     <NavLink
                         key={item.to}
@@ -160,7 +146,6 @@ function SidebarContent({ expanded, onToggle, onNavigate }: { expanded: boolean;
 export function MainLayout() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
-    const fetchCurrentPlan = useSubscriptionStore(state => state.fetchCurrentPlan);
     const loadAppData = useGlobalStore(state => state.loadAppData);
     const fetchPermissions = useAuthStore(state => state.fetchPermissions);
 
@@ -168,15 +153,13 @@ export function MainLayout() {
     // from the backend on mount so everything survives a page refresh — the auth
     // store resets on reload while the token persists in localStorage, and
     // loadAppData otherwise only runs at login. Staff get the OWNER's plan from the
-    // profile (the subscription endpoint is owner-only and would answer 403), so
     // fetchCurrentPlan runs only for owners.
     useEffect(() => {
         (async () => {
             await fetchPermissions();
             loadAppData();
-            if (!useAuthStore.getState().user.isStaff) fetchCurrentPlan();
-        })();
-    }, [fetchPermissions, fetchCurrentPlan, loadAppData]);
+            })();
+    }, [fetchPermissions, loadAppData]);
 
     return (
         <div className="min-h-screen bg-[#D8E8DD]">
