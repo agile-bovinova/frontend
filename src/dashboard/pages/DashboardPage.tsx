@@ -6,7 +6,6 @@ import { NextCampaigns } from "../components/NextCampaigns";
 import {Mars as MaleIcon} from "lucide-react";
 import {Venus as FemaleIcon} from "lucide-react";
 import {House as CabinIcon} from "lucide-react";
-import {Users as PeopleAltIcon} from "lucide-react";
 import {Package as InventoryIcon} from "lucide-react";
 import {Megaphone as CampaignIcon} from "lucide-react";
 import {Tag as LabelIcon} from "lucide-react";
@@ -17,14 +16,12 @@ export function DashboardPage() {
     animals,
     stables,
     campaigns,
-    staff,
     products,
     categories,
     fetchInfo,
     fetchAnimals,
     fetchStables,
     fetchCampaigns,
-    fetchStaff,
     fetchCategories,
     fetchProducts,
   } = useGlobalStore();
@@ -34,7 +31,6 @@ export function DashboardPage() {
     fetchAnimals();
     fetchStables();
     fetchCampaigns();
-    fetchStaff();
     fetchCategories();
     fetchProducts();
   }, []);
@@ -52,11 +48,6 @@ export function DashboardPage() {
   const femaleCount = useMemo(
     () => animals.filter((a) => a.gender?.toLowerCase() === "female").length,
     [animals],
-  );
-
-  const activeStaff = useMemo(
-    () => staff.filter((s) => s.status === 1).length,
-    [staff],
   );
 
   const totalCapacity = useMemo(
@@ -114,7 +105,7 @@ export function DashboardPage() {
         <h3 className="font-inter font-semibold text-[#0E1A12] text-base mb-4">
           Resumen rápido
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="flex flex-col gap-1">
             <span className="flex items-center gap-1.5 text-[#7E8F82] text-[11px] font-inter font-medium uppercase tracking-wider">
               <MaleIcon size={14} color="#3A82B0" />
@@ -147,15 +138,6 @@ export function DashboardPage() {
                 style={{ width: `${capPct}%` }}
               />
             </div>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-1.5 text-[#7E8F82] text-[11px] font-inter font-medium uppercase tracking-wider">
-              <PeopleAltIcon size={14} color="#3A82B0" />
-              Personal activo
-            </span>
-            <span className="text-[#0E1A12] text-xl font-bold font-inter">
-              {activeStaff}
-            </span>
           </div>
           <div className="flex flex-col gap-1">
             <span className="flex items-center gap-1.5 text-[#7E8F82] text-[11px] font-inter font-medium uppercase tracking-wider">

@@ -97,7 +97,6 @@ export const useGlobalStore = create(immer<GlobalState>((set, get) => ({
             get().fetchBreeds(),
             get().fetchStables(),
             get().fetchCampaigns(),
-            get().fetchStaff(),
             get().fetchCategories(),
             get().fetchProducts(),
         ]);
