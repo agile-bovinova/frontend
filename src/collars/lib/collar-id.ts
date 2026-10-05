@@ -1,15 +1,16 @@
 // The real device id (physical ESP32) is never shown in the assignment UI.
 // We encode a positional collar number N inside a globally-unique deviceId so
 // the UI can render a friendly "Collar N" label without exposing the raw id.
-// Format: collar-{N}-{random}. The random suffix guarantees global uniqueness
-// (the backend enforces a UNIQUE constraint on device_id across all users).
+// Format: collar-{N}-u{ownerId}. It is DETERMINISTIC: "Collar N" of an owner
+// always gets the same id, so the ESP32 is flashed once and survives
+// remove/re-assign/change. The owner id keeps it globally unique (the backend
+// enforces a UNIQUE constraint on device_id across all users).
 
 const DEVICE_ID_RE = /^collar-(\d+)-/;
 
-/** Builds a hidden, globally-unique deviceId that carries the collar number. */
-export function makeCollarDeviceId(n: number): string {
-    const rand = crypto.randomUUID().slice(0, 8);
-    return `collar-${n}-${rand}`;
+/** Builds the fixed, globally-unique deviceId of collar N for an owner. */
+export function makeCollarDeviceId(n: number, ownerId: number): string {
+    return `collar-${n}-u${ownerId}`;
 }
 
 /** Extracts the positional collar number from a deviceId, or null if it does

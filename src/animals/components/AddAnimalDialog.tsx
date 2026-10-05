@@ -3,6 +3,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useGlobalStore } from "../../shared/stores/global-store";
 import { useAnimalStore } from "../stores/animals-store";
 import { useCollarStore } from "../../collars/stores/collar-store";
+import { useAuthStore } from "../../auth/store/auth-store";
 import { makeCollarDeviceId } from "../../collars/lib/collar-id";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
@@ -19,6 +20,7 @@ export function AddAnimalDialog() {
     useAnimalStore();
   const { addAnimal, stables, breeds } = useGlobalStore();
   const isPlus = true;
+  const ownerId = useAuthStore((s) => s.user.effectiveUserId ?? s.user.id);
   const { capacity, register, fetchCollars, availableNumbers } = useCollarStore();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [validationError, setValidationError] = useState<string>("");
@@ -139,8 +141,8 @@ export function AddAnimalDialog() {
 
       // Optional collar assignment (Plus only). Two-step: the bovine must exist
       // first so we have an id to assign the collar to.
-      if (isPlus && created?.id && selectedCollar !== "") {
-        const ok = await register(makeCollarDeviceId(selectedCollar), created.id);
+      if (isPlus && created?.id && selectedCollar !== "" && ownerId !== undefined) {
+        const ok = await register(makeCollarDeviceId(selectedCollar, ownerId), created.id);
         if (!ok) {
           setValidationError(
             "Bovino creado, pero el collar no se pudo asignar. Asignalo desde editar.",
@@ -399,7 +401,7 @@ export function AddAnimalDialog() {
               </select>
               {capacity.available <= 0 && (
                 <span className="text-[11px] text-[#7E8F82] font-inter italic">
-                  Sin collares disponibles. Solicitá uno adicional en Suscripción.
+                  Sin collares disponibles (máximo 3 por cuenta).
                 </span>
               )}
             </div>

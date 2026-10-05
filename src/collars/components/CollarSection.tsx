@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCollarStore } from "../stores/collar-store";
+import { useAuthStore } from "../../auth/store/auth-store";
 import { collarLabel, makeCollarDeviceId } from "../lib/collar-id";
 
 interface CollarSectionProps {
@@ -13,6 +14,7 @@ export function CollarSection({ bovineId }: CollarSectionProps) {
         capacity, register, remove, fetchCollars, collarForBovine, availableNumbers,
         justRegisteredDeviceId, loading, error,
     } = useCollarStore();
+    const ownerId = useAuthStore((s) => s.user.effectiveUserId ?? s.user.id);
     const collar = collarForBovine(bovineId);
     const available = availableNumbers();
 
@@ -24,8 +26,8 @@ export function CollarSection({ bovineId }: CollarSectionProps) {
     }, [fetchCollars]);
 
     const handleAssign = async () => {
-        if (selectedNumber === "") return;
-        const ok = await register(makeCollarDeviceId(selectedNumber), bovineId);
+        if (selectedNumber === "" || ownerId === undefined) return;
+        const ok = await register(makeCollarDeviceId(selectedNumber, ownerId), bovineId);
         if (ok) {
             setSelectedNumber("");
             setChanging(false);
@@ -37,11 +39,12 @@ export function CollarSection({ bovineId }: CollarSectionProps) {
     };
 
     const handleChange = async () => {
-        if (!collar || selectedNumber === "") return;
+        if (!collar || selectedNumber === "" || ownerId === undefined) return;
         // Replace the device on this bovine: drop the old collar, register the new one.
         const removed = await remove(collar.id);
         if (!removed) return;
-        const ok = await register(makeCollarDeviceId(selectedNumber), bovineId);
+        // Ids are fixed per collar number, so neither ESP32 needs reflashing.
+        const ok = await register(makeCollarDeviceId(selectedNumber, ownerId), bovineId);
         if (ok) {
             setSelectedNumber("");
             setChanging(false);
@@ -152,7 +155,7 @@ export function CollarSection({ bovineId }: CollarSectionProps) {
                     </div>
                     {noCapacity && (
                         <span className="text-xs text-neutral-500 italic">
-                            Sin collares disponibles. Solicitá uno adicional en Suscripción.
+                            Sin collares disponibles (máximo 3 por cuenta).
                         </span>
                     )}
                 </div>
