@@ -1,8 +1,24 @@
 import { useEffect, useState } from "react";
-import { Sparkles, Brain, RefreshCw, AlertTriangle, CheckCircle2, AlertCircle, Thermometer, HeartPulse, Activity, SunMedium } from "lucide-react";
+import {
+    Sparkles,
+    Brain,
+    RefreshCw,
+    AlertTriangle,
+    CheckCircle2,
+    AlertCircle,
+    Thermometer,
+    HeartPulse,
+    Activity,
+    SunMedium,
+    Pill,
+    Package,
+    Clock,
+    ShieldCheck,
+    Check
+} from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { aiPredictionService } from "../services/ai-prediction-service";
-import type { BovineHealthPrediction } from "../model/health-prediction";
+import type { BovineHealthPrediction, ClinicalAdvice } from "../model/health-prediction";
 import dayjs from "dayjs";
 
 interface Props {
@@ -13,6 +29,12 @@ export function HealthPredictionCard({ bovineId }: Props) {
     const [prediction, setPrediction] = useState<BovineHealthPrediction | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Estado para el Asesor Clínico IA (cruce con inventario)
+    const [advice, setAdvice] = useState<ClinicalAdvice | null>(null);
+    const [adviceLoading, setAdviceLoading] = useState(false);
+    const [adviceError, setAdviceError] = useState<string | null>(null);
+    const [showAdvice, setShowAdvice] = useState(false);
 
     const loadPrediction = async () => {
         if (!bovineId) return;
@@ -29,8 +51,27 @@ export function HealthPredictionCard({ bovineId }: Props) {
         }
     };
 
+    const loadClinicalAdvice = async () => {
+        if (!bovineId) return;
+        setAdviceLoading(true);
+        setAdviceError(null);
+        setShowAdvice(true);
+        try {
+            const data = await aiPredictionService.getClinicalAdvice(bovineId);
+            setAdvice(data);
+        } catch (err: any) {
+            console.error("Error al obtener prescripción clínica con IA:", err);
+            setAdviceError(err?.message || "No se pudo generar la recomendación clínica.");
+        } finally {
+            setAdviceLoading(false);
+        }
+    };
+
     useEffect(() => {
         loadPrediction();
+        // Reset advice when changing bovine
+        setAdvice(null);
+        setShowAdvice(false);
     }, [bovineId]);
 
     if (loading && !prediction) {
@@ -209,6 +250,121 @@ export function HealthPredictionCard({ bovineId }: Props) {
                     </p>
                 </div>
             </div>
+
+            {/* Botón Asesor Clínico IA (Cruce con Inventario) */}
+            <div className="mt-3.5">
+                <button
+                    onClick={loadClinicalAdvice}
+                    disabled={adviceLoading}
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#10A065] to-[#0A7E4D] hover:from-[#0d8553] hover:to-[#08673f] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <span>
+                        {adviceLoading
+                            ? "Consultando inventario y asistente clínico..."
+                            : showAdvice
+                            ? "Re-consultar Prescripción con Inventario"
+                            : "✨ Sugerir Tratamiento con IA (Cruce con Inventario)"}
+                    </span>
+                </button>
+            </div>
+
+            {/* Tarjeta Expandida de Prescripción Veterinaria */}
+            {showAdvice && (
+                <div className="mt-3 bg-white rounded-xl p-4 border border-[#A5D6A7] shadow-md animate-fade-in text-xs font-inter">
+                    {adviceLoading ? (
+                        <div className="py-6 flex flex-col items-center justify-center gap-2 text-neutral-500">
+                            <CircularProgress size={24} className="text-[#10A065]" />
+                            <span className="text-xs">Analizando fármacos en stock y formulando dosis...</span>
+                        </div>
+                    ) : adviceError ? (
+                        <div className="p-3 bg-red-50 text-red-600 rounded-lg border border-red-200">
+                            {adviceError}
+                        </div>
+                    ) : advice ? (
+                        <div className="space-y-3">
+                            {/* Header de la Ficha */}
+                            <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                                        <Pill className="w-4 h-4 text-[#10A065]" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-neutral-900 text-xs leading-tight">
+                                            Ficha de Prescripción Asistida
+                                        </h4>
+                                        <span className="text-[10px] text-neutral-500 block">
+                                            {advice.clinicalSummary}
+                                        </span>
+                                    </div>
+                                </div>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 text-neutral-700 border border-neutral-200">
+                                    <ShieldCheck className="w-3 h-3 text-[#10A065]" />
+                                    {advice.source === "Gemini-AI" ? "Gemini LLM" : "Motor Clínico"}
+                                </span>
+                            </div>
+
+                            {/* Fármaco y Disponibilidad en Inventario */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-neutral-50 p-2.5 rounded-xl border border-neutral-200">
+                                <div>
+                                    <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                                        Medicamento y Posología
+                                    </span>
+                                    <span className="font-bold text-neutral-900 text-xs block mt-0.5">
+                                        {advice.prescribedMedicine}
+                                    </span>
+                                    <span className="text-[11px] text-[#10A065] font-semibold block mt-0.5">
+                                        {advice.dosageAndRoute}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                                        Estado en Inventario
+                                    </span>
+                                    <div className="mt-1 flex items-center gap-1.5">
+                                        {advice.inventoryStatus === "InStock" ? (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                <Package className="w-3 h-3 text-emerald-600" />
+                                                En Almacén
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                                <AlertTriangle className="w-3 h-3 text-amber-600" />
+                                                Compra Urgente
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="text-[11px] text-neutral-600 block mt-0.5 font-medium">
+                                        {advice.inventoryDetails}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Medidas Físicas de Primeros Auxilios */}
+                            <div>
+                                <span className="font-bold text-neutral-800 block mb-1 text-xs">
+                                    Medidas Físicas Inmediatas en Campo:
+                                </span>
+                                <ul className="space-y-1">
+                                    {advice.firstAidMeasures.map((measure, idx) => (
+                                        <li key={idx} className="flex items-start gap-1.5 text-neutral-600 text-[11px] leading-relaxed">
+                                            <Check className="w-3.5 h-3.5 text-[#10A065] shrink-0 mt-0.5" />
+                                            <span>{measure}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Seguimiento */}
+                            <div className="flex items-center gap-2 pt-2 border-t border-neutral-100 text-[11px] text-neutral-600">
+                                <Clock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                                <span><strong>Seguimiento:</strong> {advice.followUpInstructions}</span>
+                            </div>
+                        </div>
+                    ) : null}
+                </div>
+            )}
 
             {/* Footer */}
             <div className="mt-3 flex items-center justify-between text-[10px] text-neutral-400">

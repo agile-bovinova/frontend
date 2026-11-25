@@ -17,3 +17,17 @@ export interface BovineHealthPrediction {
     readingsEvaluated: number;
     evaluatedAt: string;
 }
+
+export interface ClinicalAdvice {
+    bovineId: number;
+    bovineName: string;
+    clinicalSummary: string;
+    prescribedMedicine: string;
+    dosageAndRoute: string;
+    inventoryStatus: "InStock" | "OutOfStock" | "NoInventory";
+    inventoryDetails: string;
+    firstAidMeasures: string[];
+    followUpInstructions: string;
+    source: "Gemini-AI" | "Embedded-Clinical-Engine";
+    generatedAt: string;
+}
