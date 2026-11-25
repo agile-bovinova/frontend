@@ -1,7 +1,6 @@
 import {House as CabinIcon} from "lucide-react";
 import {Megaphone as CampaignIcon} from "lucide-react";
 import {Package as InventoryIcon} from "lucide-react";
-import {Users as PeopleAltIcon} from "lucide-react";
 import {PawPrint as PetsIcon} from "lucide-react";
 import dayjs from "dayjs";
 import { DashboardCard } from "./DashboardCard";
@@ -14,7 +13,7 @@ const variants = [
 ] as const;
 
 export function DashboardCards() {
-  const { info, animals, stables, campaigns, staff, products } =
+  const { info, animals, stables, campaigns, products } =
     useGlobalStore();
 
   const cards = [
@@ -71,16 +70,6 @@ export function DashboardCards() {
         };
       }),
       route: "/campaigns",
-    },
-    {
-      title: "Personal",
-      content: info?.totalStaff?.toString() || "0",
-      icon: <PeopleAltIcon />,
-      items: staff.slice(0, 4).map((s) => ({
-        label: s.name || "—",
-        detail: s.status === 1 ? "Activo" : "Inactivo",
-      })),
-      route: "/staff",
     },
     {
       title: "Inventario",
