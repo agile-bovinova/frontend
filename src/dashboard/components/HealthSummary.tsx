@@ -81,7 +81,7 @@ export function HealthSummary() {
                 <div className="flex items-center gap-2">
                     <HeartPulse size={18} className="text-[#0A7E4D]" />
                     <h3 className="font-inter font-semibold text-[#0E1A12] text-base">
-                        Estado sanitario del hato
+                        Estado sanitario de los establos
                     </h3>
                 </div>
                 <button

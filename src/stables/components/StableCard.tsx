@@ -204,8 +204,12 @@ export function StableCard({ stable }: StableCardProps) {
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <span className="text-base font-semibold text-[#0E1A12] font-inter block truncate">
-                                                        {a.name} <span className={`text-sm ${color}`}>{symbol}</span>
+                                                    <span className="text-base font-semibold text-[#0E1A12] font-inter flex items-center gap-1.5 truncate">
+                                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#E8F5E9] text-[#1B5E20] border border-[#A5D6A7]">
+                                                            🔔 BOV-{String(a.id).padStart(3, '0')}
+                                                        </span>
+                                                        <span>{a.name}</span>
+                                                        <span className={`text-sm ${color}`}>{symbol}</span>
                                                     </span>
                                                     <span className="text-xs text-[#4F6354] font-inter">
                                                         {a.breed} · {dayjs().diff(dayjs(a.birthDate), "year")} años

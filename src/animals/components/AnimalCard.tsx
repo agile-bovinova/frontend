@@ -7,6 +7,7 @@ import {PawPrint as PetsIcon} from "lucide-react";
 import {House as HomeIcon} from "lucide-react";
 import {Thermometer as DeviceThermostatIcon} from "lucide-react";
 import {Heart as FavoriteIcon} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useGlobalStore } from "../../shared/stores/global-store";
@@ -14,6 +15,7 @@ import { useAuthStore } from "../../auth/store/auth-store";
 import { canEdit } from "../../shared/utils/access-control";
 import { CollarSection } from "../../collars/components/CollarSection";
 import { Animal } from "../model/animal";
+import { HealthPredictionModal } from "./HealthPredictionModal";
 import dayjs from "dayjs";
 
 interface AnimalCardProps {
@@ -27,7 +29,9 @@ export function AnimalCard({ animal }: AnimalCardProps) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAiPrediction, setShowAiPrediction] = useState(false);
   const [editedName, setEditedName] = useState(animal.name);
+  const [editedCode, setEditedCode] = useState(animal.code || `BOV-${String(animal.id).padStart(3, '0')}`);
   const [editedGender, setEditedGender] = useState(animal.gender);
   const [editedBirthDate, setEditedBirthDate] = useState(animal.birthDate);
   const [editedBreed, setEditedBreed] = useState(animal.breed);
@@ -66,6 +70,7 @@ export function AnimalCard({ animal }: AnimalCardProps) {
       await updateAnimal({
         ...animal,
         name: editedName,
+        code: editedCode.trim(),
         gender: editedGender,
         birthDate: editedBirthDate,
         breed: editedBreed,
@@ -83,6 +88,7 @@ export function AnimalCard({ animal }: AnimalCardProps) {
 
   const handleCancel = () => {
     setEditedName(animal.name);
+    setEditedCode(animal.code || `BOV-${String(animal.id).padStart(3, '0')}`);
     setEditedGender(animal.gender);
     setEditedBirthDate(animal.birthDate);
     setEditedBreed(animal.breed);
@@ -117,19 +123,21 @@ export function AnimalCard({ animal }: AnimalCardProps) {
           {/* Top: photo + name + actions */}
           <div className="flex gap-4">
             <div
-              className={`w-20 h-20 rounded-full ${genderBg} flex items-center justify-center shrink-0 overflow-hidden ring-2 ring-white shadow-md`}
+              className={`w-20 h-20 rounded-full ${genderBg} flex items-center justify-center shrink-0 overflow-hidden ring-2 ring-white shadow-md relative`}
             >
-              {photoUrl ? (
+              {photoUrl && (
                 <img
                   src={photoUrl}
                   alt={animal.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = 'none';
+                  }}
                 />
-              ) : (
-                <span className={`text-3xl font-bold ${genderColor}`}>
-                  {genderSymbol}
-                </span>
               )}
+              <span className={`text-3xl font-bold ${genderColor} ${photoUrl ? 'hidden' : 'block'}`}>
+                {genderSymbol}
+              </span>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -138,20 +146,34 @@ export function AnimalCard({ animal }: AnimalCardProps) {
                   <input
                     className="text-lg font-bold text-[#0E1A12] font-inter focus:outline-none bg-[#F4F8F2] border border-[#E1E7DF] px-3 py-1.5 rounded-[8px] w-full transition-all duration-200 focus:border-[#10A065] focus:ring-2 focus:ring-[#C8F0DA]"
                     value={editedName}
+                    placeholder="Nombre"
                     onChange={(e) => setEditedName(e.target.value)}
                   />
-                  <div className="mt-1">
-                    <label className="text-[11px] font-medium text-[#4F6354] font-inter block">
-                      Género
-                    </label>
-                    <select
-                      className="text-sm font-medium font-inter focus:outline-none bg-[#F4F8F2] border border-[#E1E7DF] px-2.5 py-1 rounded-[8px] w-full transition-all duration-200 focus:border-[#10A065] focus:ring-2 focus:ring-[#C8F0DA]"
-                      value={editedGender}
-                      onChange={(e) => setEditedGender(e.target.value)}
-                    >
-                      <option value="male">♂ Macho</option>
-                      <option value="female">♀ Hembra</option>
-                    </select>
+                  <div className="grid grid-cols-2 gap-2 mt-1.5">
+                    <div>
+                      <label className="text-[11px] font-medium text-[#4F6354] font-inter block">
+                        Código / Caravana
+                      </label>
+                      <input
+                        className="text-xs font-semibold font-mono focus:outline-none bg-[#F4F8F2] border border-[#E1E7DF] px-2 py-1 rounded-[8px] w-full transition-all duration-200 focus:border-[#10A065] focus:ring-2 focus:ring-[#C8F0DA]"
+                        value={editedCode}
+                        placeholder="BOV-001"
+                        onChange={(e) => setEditedCode(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-medium text-[#4F6354] font-inter block">
+                        Género
+                      </label>
+                      <select
+                        className="text-xs font-medium font-inter focus:outline-none bg-[#F4F8F2] border border-[#E1E7DF] px-2 py-1 rounded-[8px] w-full transition-all duration-200 focus:border-[#10A065] focus:ring-2 focus:ring-[#C8F0DA]"
+                        value={editedGender}
+                        onChange={(e) => setEditedGender(e.target.value)}
+                      >
+                        <option value="male">♂ Macho</option>
+                        <option value="female">♀ Hembra</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-1 shrink-0 ml-2">
@@ -295,33 +317,52 @@ export function AnimalCard({ animal }: AnimalCardProps) {
           {/* Top: photo + name + actions */}
           <div className="flex gap-4">
             <div
-              className={`w-20 h-20 rounded-full ${genderBg} flex items-center justify-center shrink-0 overflow-hidden ring-2 ring-white shadow-md`}
+              className={`w-20 h-20 rounded-full ${genderBg} flex items-center justify-center shrink-0 overflow-hidden ring-2 ring-white shadow-md relative`}
             >
-              {photoUrl ? (
+              {photoUrl && (
                 <img
                   src={photoUrl}
                   alt={animal.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = 'none';
+                  }}
                 />
-              ) : (
-                <span className={`text-3xl font-bold ${genderColor}`}>
-                  {genderSymbol}
-                </span>
               )}
+              <span className={`text-3xl font-bold ${genderColor} ${photoUrl ? 'hidden' : 'block'}`}>
+                {genderSymbol}
+              </span>
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-[#0E1A12] text-lg font-bold font-inter truncate">
-                    {animal.name}
-                  </h3>
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-[#E8F5E9] text-[#1B5E20] border border-[#A5D6A7] shadow-2xs"
+                      title="Identificador oficial de caravana / arete del animal"
+                    >
+                      🔔 {animal.code || `BOV-${String(animal.id).padStart(3, '0')}`}
+                    </span>
+                    <h3 className="text-[#0E1A12] text-lg font-bold font-inter truncate">
+                      {animal.name}
+                    </h3>
+                  </div>
                   <div className="flex flex-wrap items-center gap-1.5 mt-1">
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium font-inter ${genderPillBg} ${genderPillText}`}
                     >
                       {genderSymbol} {genderLabel}
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowAiPrediction(true)}
+                      className="cursor-pointer inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold font-inter bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-all active:scale-95 shadow-xs"
+                      title="Ver evaluación predictiva de salud con Inteligencia Artificial"
+                    >
+                      <Sparkles className="w-3 h-3 text-emerald-600" />
+                      <span>Salud IA</span>
+                    </button>
                   </div>
                 </div>
                 {editable && (
@@ -454,6 +495,14 @@ export function AnimalCard({ animal }: AnimalCardProps) {
           </div>,
           document.body,
         )}
+
+      {showAiPrediction && (
+        <HealthPredictionModal
+          bovineId={animal.id}
+          bovineName={animal.name}
+          onClose={() => setShowAiPrediction(false)}
+        />
+      )}
     </div>
   );
 }

@@ -44,6 +44,9 @@ export class AnimalsService {
     const formData = new FormData();
     formData.append("name", animal.name);
     formData.append("gender", animal.gender);
+    if (animal.code) {
+      formData.append("code", animal.code);
+    }
     formData.append("birthDate", animal.birthDate);
     formData.append("breed", animal.breed);
     formData.append("stableId", String(animal.stableId));

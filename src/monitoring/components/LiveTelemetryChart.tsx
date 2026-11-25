@@ -111,30 +111,30 @@ export function LiveTelemetryChart({ records }: Props) {
                     series={[
                         {
                             data: temps,
-                            label: "Temp °C",
+                            label: "Temp (°C)",
                             yAxisId: "temp",
-                            color: "#f97316",
+                            color: "#10b981", // Verde Esmeralda Vibrante
                             showMark: points.length <= 60,
                             valueFormatter: (v: number | null) => (v == null ? "" : `${v.toFixed(1)} °C`),
                         },
                         {
                             data: beats,
-                            label: "BPM",
+                            label: "Ritmo Cardíaco (BPM)",
                             yAxisId: "bpm",
-                            color: "#ef4444",
+                            color: "#2563eb", // Azul Real Intenso (Alto Contraste)
                             showMark: points.length <= 60,
                             valueFormatter: (v: number | null) => (v == null ? "" : `${v.toFixed(0)} BPM`),
                         },
                     ]}
                 >
                     <ChartsReferenceLine axisId="temp" y={BOVINE_RANGES.temperature.max}
-                        lineStyle={{ stroke: "#f97316", strokeDasharray: "4 4", strokeWidth: 1 }} />
+                        lineStyle={{ stroke: "#10b981", strokeDasharray: "4 4", strokeWidth: 1.5 }} />
                     <ChartsReferenceLine axisId="temp" y={BOVINE_RANGES.temperature.min}
-                        lineStyle={{ stroke: "#f97316", strokeDasharray: "4 4", strokeWidth: 1 }} />
+                        lineStyle={{ stroke: "#10b981", strokeDasharray: "4 4", strokeWidth: 1.5 }} />
                     <ChartsReferenceLine axisId="bpm" y={BOVINE_RANGES.heartRate.max}
-                        lineStyle={{ stroke: "#ef4444", strokeDasharray: "4 4", strokeWidth: 1 }} />
+                        lineStyle={{ stroke: "#2563eb", strokeDasharray: "4 4", strokeWidth: 1.5 }} />
                     <ChartsReferenceLine axisId="bpm" y={BOVINE_RANGES.heartRate.min}
-                        lineStyle={{ stroke: "#ef4444", strokeDasharray: "4 4", strokeWidth: 1 }} />
+                        lineStyle={{ stroke: "#2563eb", strokeDasharray: "4 4", strokeWidth: 1.5 }} />
                 </LineChart>
             )}
         </div>

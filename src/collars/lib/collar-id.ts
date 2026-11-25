@@ -1,20 +1,16 @@
-// The real device id (physical ESP32) is never shown in the assignment UI.
-// We encode a positional collar number N inside a globally-unique deviceId so
-// the UI can render a friendly "Collar N" label without exposing the raw id.
-// Format: collar-{N}-u{ownerId}. It is DETERMINISTIC: "Collar N" of an owner
-// always gets the same id, so the ESP32 is flashed once and survives
-// remove/re-assign/change. The owner id keeps it globally unique (the backend
-// enforces a UNIQUE constraint on device_id across all users).
+// Format: COL-{N} or collar-{N}-u{ownerId}. It is DETERMINISTIC: "Collar N"
+// always gets the same clean device ID format (e.g. COL-001, COL-002, etc.)
+// which matches the MQTT simulator and hardware ESP32 convention.
 
-const DEVICE_ID_RE = /^collar-(\d+)-/;
+const DEVICE_ID_RE = /^(?:collar|col)-?(\d+)/i;
 
-/** Builds the fixed, globally-unique deviceId of collar N for an owner. */
-export function makeCollarDeviceId(n: number, ownerId: number): string {
-    return `collar-${n}-u${ownerId}`;
+/** Builds the fixed, standardized deviceId of collar N. */
+export function makeCollarDeviceId(n: number, _ownerId?: number): string {
+    return `COL-${String(n).padStart(3, '0')}`;
 }
 
 /** Extracts the positional collar number from a deviceId, or null if it does
- *  not follow our convention (e.g. legacy raw ESP32 ids). */
+ *  not follow our convention. */
 export function parseCollarNumber(deviceId: string): number | null {
     const match = DEVICE_ID_RE.exec(deviceId);
     return match ? Number(match[1]) : null;
@@ -23,5 +19,5 @@ export function parseCollarNumber(deviceId: string): number | null {
 /** Friendly label shown in place of the real device id. */
 export function collarLabel(deviceId: string): string {
     const n = parseCollarNumber(deviceId);
-    return n !== null ? `Collar ${n}` : "Collar";
+    return n !== null ? `Collar ${n} (${deviceId})` : `Collar (${deviceId})`;
 }

@@ -231,6 +231,23 @@ export function AddAnimalDialog() {
             />
           </div>
 
+          {/* Código / Caravana */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="code" className="text-sm font-medium text-[#0E1A12] font-inter">Código / Caravana</label>
+              <span className="text-xs text-[#7E8F82] font-inter">Opcional (ej: BOV-001)</span>
+            </div>
+            <input
+              id="code"
+              type="text"
+              autoComplete="off"
+              placeholder="Ej. BOV-001 (se autogenera si se deja vacío)"
+              className="focus:outline-none border border-[#E1E7DF] px-3 py-2.5 rounded-[10px] text-sm font-inter placeholder-[#7E8F82] transition-all duration-200 focus:border-[#10A065] focus:ring-2 focus:ring-[#C8F0DA]"
+              value={newAnimal.code || ""}
+              onChange={(e) => setNewAnimal({ code: e.target.value })}
+            />
+          </div>
+
           {/* Género */}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="gender" className="text-sm font-medium text-[#0E1A12] font-inter">Género</label>
@@ -306,6 +323,11 @@ export function AddAnimalDialog() {
                 </option>
               ))}
             </select>
+            {stables.length === 0 && (
+              <span className="text-xs text-amber-600 font-inter mt-1 block">
+                No tienes establos creados. Primero crea un establo en "Establos" para asignarle este bovino.
+              </span>
+            )}
           </div>
 
           {/* Umbrales */}
@@ -395,13 +417,13 @@ export function AddAnimalDialog() {
                 <option value="">Sin collar</option>
                 {availableNumbers().map((n) => (
                   <option key={n} value={n}>
-                    Collar {n}
+                    Collar {n} (COL-{String(n).padStart(3, '0')})
                   </option>
                 ))}
               </select>
               {capacity.available <= 0 && (
                 <span className="text-[11px] text-[#7E8F82] font-inter italic">
-                  Sin collares disponibles (máximo 3 por cuenta).
+                  Sin collares disponibles (máximo {capacity.allowance} por cuenta).
                 </span>
               )}
             </div>

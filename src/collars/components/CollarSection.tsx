@@ -72,7 +72,7 @@ export function CollarSection({ bovineId }: CollarSectionProps) {
                     justRegistered ? "bg-brand-default/5 border-brand-default/30" : "bg-white border-neutral-200"
                 }`}>
                     <span className={`text-xs font-semibold ${justRegistered ? "text-brand-dark" : "text-neutral-600"}`}>
-                        {justRegistered ? "✅ Collar registrado. " : ""}Copiá este ID a tu ESP32 (constante DEVICE_ID):
+                        {justRegistered ? "✅ Collar vinculado exitosamente. " : ""}Dispositivo de monitoreo asignado:
                     </span>
                     <div className="flex items-center gap-2">
                         <code className="flex-1 text-sm font-mono bg-white border border-neutral-300 rounded-sm px-2 py-1 select-all">
@@ -128,7 +128,7 @@ export function CollarSection({ bovineId }: CollarSectionProps) {
                         <option value="">-- Elegí un collar --</option>
                         {available.map((n) => (
                             <option key={n} value={n}>
-                                Collar {n}
+                                Collar {n} (COL-{String(n).padStart(3, '0')})
                             </option>
                         ))}
                     </select>
