@@ -16,6 +16,7 @@ interface AlertsState {
   pollAlerts: (userId: number) => Promise<void>;
   markAsRead: (alertId: number) => Promise<void>;
   dismissToast: (alertId: number) => void;
+  dismissAllToasts: () => void;
 }
 
 export const useAlertsStore = create(
@@ -73,6 +74,10 @@ export const useAlertsStore = create(
             state.toasts.push(a);
             state.seenIds.push(a.id);
           }
+          // Cap the toast queue to at most 3 to avoid flooding the screen
+          if (state.toasts.length > 3) {
+            state.toasts = state.toasts.slice(-3);
+          }
         });
       } catch (error) {
         console.error(error);
@@ -96,6 +101,12 @@ export const useAlertsStore = create(
     dismissToast: (alertId) => {
       set((state) => {
         state.toasts = state.toasts.filter((t) => t.id !== alertId);
+      });
+    },
+
+    dismissAllToasts: () => {
+      set((state) => {
+        state.toasts = [];
       });
     },
   })),
