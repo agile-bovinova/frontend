@@ -91,8 +91,18 @@ export function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) {
         );
     }
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+        if (step === "request") {
+            handleRequest();
+        } else {
+            handleReset();
+        }
+    };
+
     return (
-        <div className="w-full font-inter text-[#0E1A12] flex flex-col gap-5">
+        <form onSubmit={handleSubmit} noValidate className="w-full font-inter text-[#0E1A12] flex flex-col gap-5">
             <button
                 type="button"
                 className="flex items-center gap-1.5 text-sm text-[#4F6354] hover:text-[#0A7E4D] w-fit"
@@ -176,10 +186,9 @@ export function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) {
             {error && <span className="text-[#D04A3A] text-xs font-inter">{error}</span>}
 
             <button
-                type="button"
+                type="submit"
                 disabled={isSubmitting}
                 className="w-full h-14 bg-gradient-to-r from-[#10A065] to-[#0A7E4D] text-white font-inter text-sm font-semibold rounded-[14px] flex items-center justify-center gap-2 cursor-pointer transition-all duration-150 active:scale-[0.97] shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
-                onClick={step === "request" ? handleRequest : handleReset}
                 aria-busy={isSubmitting}
             >
                 {isSubmitting ? (
@@ -201,6 +210,6 @@ export function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) {
                     ¿No recibiste el código? Reenviar
                 </button>
             )}
-        </div>
+        </form>
     );
 }

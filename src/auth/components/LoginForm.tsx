@@ -50,8 +50,14 @@ export function LoginForm({ onForgotPassword }: LoginFormProps = {}) {
         }
     };
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (isSubmitting || isLoading) return;
+        handleLogin();
+    };
+
     return (
-        <div className="w-full font-inter text-[#0E1A12] flex flex-col gap-5">
+        <form onSubmit={handleSubmit} noValidate className="w-full font-inter text-[#0E1A12] flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
                 <label htmlFor="email" className="text-sm font-medium text-[#4F6354]">Email</label>
                 <input
@@ -102,10 +108,9 @@ export function LoginForm({ onForgotPassword }: LoginFormProps = {}) {
             )}
 
             <button
-                type="button"
+                type="submit"
                 disabled={isSubmitting || isLoading}
                 className="w-full h-14 bg-gradient-to-r from-[#10A065] to-[#0A7E4D] text-white font-inter text-sm font-semibold rounded-[14px] flex items-center justify-center gap-2 cursor-pointer transition-all duration-150 active:scale-[0.97] shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
-                onClick={handleLogin}
                 aria-busy={isSubmitting || isLoading}
             >
                 {isSubmitting || isLoading ? (
@@ -114,6 +119,6 @@ export function LoginForm({ onForgotPassword }: LoginFormProps = {}) {
                     "Iniciar sesión"
                 )}
             </button>
-        </div>
+        </form>
     );
 }
